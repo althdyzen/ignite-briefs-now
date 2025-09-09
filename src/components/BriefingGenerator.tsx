@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, ArrowRight, CheckCircle, Lightbulb, Target, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle, CloudCog, Lightbulb, Target, Users } from "lucide-react";
 
 interface BriefingData {
   companyName: string;
@@ -22,7 +22,7 @@ interface BriefingData {
 const steps = [
   {
     id: 1,
-    title: "Informações da Startup",
+    title: "Informações da startup",
     description: "Dados básicos sobre sua empresa",
     icon: Users,
   },
@@ -69,9 +69,16 @@ export const BriefingGenerator = ({ onBack }: { onBack: () => void }) => {
     }
   };
 
-  const handleGenerate = () => {
-    // Aqui você implementaria a lógica de geração do briefing
+  const handleGenerate = async () => {
     console.log("Generating briefing with data:", briefingData);
+
+    const res = await fetch("http://localhost:8090/briefing", {
+      method: "POST",
+      body: JSON.stringify(briefingData),
+    })
+    const resJson = await res.json()
+
+    console.log(resJson.candidates[0].content.parts[0].text)
   };
 
   const renderStepContent = () => {
@@ -80,7 +87,7 @@ export const BriefingGenerator = ({ onBack }: { onBack: () => void }) => {
         return (
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="companyName">Nome da Startup *</Label>
+              <Label htmlFor="companyName" required={true}>Nome da startup</Label>
               <Input
                 id="companyName"
                 placeholder="Ex: TechInova"
@@ -95,7 +102,7 @@ export const BriefingGenerator = ({ onBack }: { onBack: () => void }) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="industry">Setor de Atuação *</Label>
+              <Label htmlFor="industry" required={true}>Setor de atuação</Label>
               <Select onValueChange={(value) => updateData("industry", value)}>
                 <SelectTrigger id="industry" aria-describedby="industry-help">
                   <SelectValue placeholder="Selecione o setor" />
@@ -116,7 +123,7 @@ export const BriefingGenerator = ({ onBack }: { onBack: () => void }) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="targetAudience">Público-Alvo *</Label>
+              <Label htmlFor="targetAudience" required={true}>Público-alvo</Label>
               <Textarea
                 id="targetAudience"
                 placeholder="Ex: Pequenos empreendedores entre 25-45 anos que buscam soluções financeiras digitais..."
@@ -137,7 +144,7 @@ export const BriefingGenerator = ({ onBack }: { onBack: () => void }) => {
         return (
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="problem">Problema que Resolve *</Label>
+              <Label htmlFor="problem" required={true}>Problema que resolve</Label>
               <Textarea
                 id="problem"
                 placeholder="Descreva o problema principal que sua startup resolve..."
@@ -153,7 +160,7 @@ export const BriefingGenerator = ({ onBack }: { onBack: () => void }) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="solution">Sua Solução *</Label>
+              <Label htmlFor="solution" required={true}>Sua solução</Label>
               <Textarea
                 id="solution"
                 placeholder="Explique como sua startup resolve esse problema..."
@@ -174,7 +181,7 @@ export const BriefingGenerator = ({ onBack }: { onBack: () => void }) => {
         return (
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="objectives">Objetivos do Projeto *</Label>
+              <Label htmlFor="objectives" required={true}>Objetivos do projeto</Label>
               <Textarea
                 id="objectives"
                 placeholder="Ex: Aumentar reconhecimento da marca, gerar 1000 leads qualificados..."
@@ -191,7 +198,7 @@ export const BriefingGenerator = ({ onBack }: { onBack: () => void }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="timeline">Prazo Desejado</Label>
+                <Label htmlFor="timeline">Prazo desejado</Label>
                 <Select onValueChange={(value) => updateData("timeline", value)}>
                   <SelectTrigger id="timeline">
                     <SelectValue placeholder="Selecione o prazo" />
@@ -207,7 +214,7 @@ export const BriefingGenerator = ({ onBack }: { onBack: () => void }) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="budget">Orçamento Disponível</Label>
+                <Label htmlFor="budget">Orçamento disponível</Label>
                 <Select onValueChange={(value) => updateData("budget", value)}>
                   <SelectTrigger id="budget">
                     <SelectValue placeholder="Faixa de investimento" />
