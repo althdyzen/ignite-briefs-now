@@ -57,8 +57,24 @@ export const BriefingGenerator = ({ onBack }: { onBack: () => void }) => {
     setBriefingData(prev => ({ ...prev, [field]: value }));
   };
 
+  const validateCurrentStep = () => {
+    switch (currentStep) {
+      case 1:
+        return briefingData.companyName.trim() !== "" && 
+               briefingData.industry !== "" && 
+               briefingData.targetAudience.trim() !== "";
+      case 2:
+        return briefingData.problem.trim() !== "" && 
+               briefingData.solution.trim() !== "";
+      case 3:
+        return briefingData.objectives.trim() !== "";
+      default:
+        return false;
+    }
+  };
+
   const handleNext = () => {
-    if (currentStep < 3) {
+    if (currentStep < 3 && validateCurrentStep()) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -310,12 +326,20 @@ export const BriefingGenerator = ({ onBack }: { onBack: () => void }) => {
         </Button>
 
         {currentStep < 3 ? (
-          <Button variant="hero" onClick={handleNext}>
+          <Button 
+            variant="hero" 
+            onClick={handleNext}
+            disabled={!validateCurrentStep()}
+          >
             Próximo
             <ArrowRight className="h-4 w-4" />
           </Button>
         ) : (
-          <Button variant="accent" onClick={handleGenerate}>
+          <Button 
+            variant="accent" 
+            onClick={handleGenerate}
+            disabled={!validateCurrentStep()}
+          >
             <CheckCircle className="h-4 w-4" />
             Gerar Briefing
           </Button>
