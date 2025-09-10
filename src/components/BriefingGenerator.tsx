@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, ArrowRight, CheckCircle, CloudCog, Lightbulb, Target, Users } from "lucide-react";
+import { BriefingResult } from "./BriefingResult";
 
 interface BriefingData {
   companyName: string;
@@ -42,6 +43,9 @@ const steps = [
 
 export const BriefingGenerator = ({ onBack }: { onBack: () => void }) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [showResult, setShowResult] = useState(false);
+  const [generatedBriefing, setGeneratedBriefing] = useState<any>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [briefingData, setBriefingData] = useState<BriefingData>({
     companyName: "",
     industry: "",
@@ -86,15 +90,51 @@ export const BriefingGenerator = ({ onBack }: { onBack: () => void }) => {
   };
 
   const handleGenerate = async () => {
-    console.log("Generating briefing with data:", briefingData);
+    if (!validateCurrentStep()) return;
+    
+    setIsGenerating(true);
+    try {
+      console.log("Generating briefing with data:", briefingData);
 
-    const res = await fetch("http://localhost:8090/briefing", {
-      method: "POST",
-      body: JSON.stringify(briefingData),
-    })
-    const resJson = await res.json()
+      const res = await fetch("http://localhost:8090/briefing", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(briefingData),
+      });
 
-    console.log(resJson.candidates[0].content.parts[0].text)
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const resJson = await res.json();
+      console.log("Generated briefing:", resJson);
+      
+      setGeneratedBriefing(resJson);
+      setShowResult(true);
+    } catch (error) {
+      console.error("Error generating briefing:", error);
+      // You could show an error toast here
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleNewBriefing = () => {
+    setShowResult(false);
+    setGeneratedBriefing(null);
+    setCurrentStep(1);
+    setBriefingData({
+      companyName: "",
+      industry: "",
+      targetAudience: "",
+      problem: "",
+      solution: "",
+      objectives: "",
+      timeline: "",
+      budget: "",
+    });
   };
 
   const renderStepContent = () => {
@@ -253,6 +293,17 @@ export const BriefingGenerator = ({ onBack }: { onBack: () => void }) => {
     }
   };
 
+  // Show result screen if briefing was generated
+  if (showResult && generatedBriefing) {
+    return (
+      <BriefingResult 
+        briefingData={generatedBriefing}
+        onBack={() => setShowResult(false)}
+        onNewBriefing={handleNewBriefing}
+      />
+    );
+  }
+
   const progress = (currentStep / 3) * 100;
   const CurrentIcon = steps[currentStep - 1].icon;
 
@@ -338,10 +389,10 @@ export const BriefingGenerator = ({ onBack }: { onBack: () => void }) => {
           <Button 
             variant="accent" 
             onClick={handleGenerate}
-            disabled={!validateCurrentStep()}
+            disabled={!validateCurrentStep() || isGenerating}
           >
             <CheckCircle className="h-4 w-4" />
-            Gerar Briefing
+            {isGenerating ? "Gerando..." : "Gerar Briefing"}
           </Button>
         )}
       </div>
