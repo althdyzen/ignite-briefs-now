@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,10 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { FileText, Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import DisclaimerModal from "@/components/DisclaimerModal";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -17,6 +19,10 @@ const Login = () => {
   
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    setShowDisclaimer(true);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +47,12 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle flex items-center justify-center px-6 py-12">
+    <>
+      <DisclaimerModal 
+        isOpen={showDisclaimer} 
+        onClose={() => setShowDisclaimer(false)} 
+      />
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
@@ -187,7 +198,8 @@ const Login = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

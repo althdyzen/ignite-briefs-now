@@ -1,10 +1,18 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { FileText, Zap, Users, Shield, ArrowRight, CheckCircle } from "lucide-react";
 import heroImage from "@/assets/hero-briefing.jpg";
+import DisclaimerModal from "@/components/DisclaimerModal";
 
 const Home = () => {
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+
+  useEffect(() => {
+    setShowDisclaimer(true);
+  }, []);
+
   const features = [
     {
       icon: <Zap className="h-6 w-6" />,
@@ -31,7 +39,12 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <>
+      <DisclaimerModal 
+        isOpen={showDisclaimer} 
+        onClose={() => setShowDisclaimer(false)} 
+      />
+      <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex items-center justify-between h-16 px-6">
@@ -187,7 +200,8 @@ const Home = () => {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   );
 };
 
